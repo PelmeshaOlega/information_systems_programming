@@ -22,7 +22,6 @@ class ChemistryClasses(EducationalClasses):
     """
     Это класс ChemistryClasses.
     Он представляет собой учебное занятие по химии в расписании.
-    Наследуется от EducationalClasses.
     """
     __reagents: list
     __protective_equipment: list
@@ -37,7 +36,6 @@ class MusicClasses(EducationalClasses):
     """
     Это класс MusicClasses.
     Он представляет собой учебное занятие по музыке в расписании.
-    Наследуется от EducationalClasses.
     """
     __music: str
     __instrument: list
@@ -48,24 +46,26 @@ class MusicClasses(EducationalClasses):
         self.music = music
         self.instrument = instrument
 
-def materials_for_lessons(s: str, e:str, l: list) -> list:
+def materials_for_lessons(start: str, end:str, source_info: list) -> list:
     """
-    Этот метод возвращает все материалы
-    необходимые для урока, введённые в строке.
+    source_info - информация из введённой пользователем строки в файле, разделённая на слова.
+    start - слово, с которого начинаются материалы определённого типа в source_info (реагенты или музыка).
+    end - слово, с которого начинаются дополнительные материалы к уроку в source_info.
+    (защита, в случае реагентов и инструменты, в случае музыки)
     """
     materials = []
-    for i in range(l.index(s) + 1, l.index(e)):
+    for i in range(source_info.index(start) + 1, source_info.index(end)):
         materials.append(info_sep[i])
     return materials
 
-def additional_for_lessons(e:str, l:list) -> list:
+def additional_for_lessons(start:str, source_info:list) -> list:
     """
-    Этот метод возвращает все дополнительные средства
-    необходимые для урока, введённые в строке.
+    source_info - информация из введённой пользователем строки в файле, разделённая на слова.
+    start - слово в source info, с которого начинаются дополнительные материалы к уроку.
     """
     additional = []
-    for i in range(l.index(e) + 1, len(l)):
-        additional.append(l[i])
+    for i in range(source_info.index(start) + 1, len(source_info)):
+        additional.append(source_info[i])
     return additional
 
 objects_list = []
