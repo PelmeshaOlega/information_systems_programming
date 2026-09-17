@@ -82,7 +82,7 @@ for info in information:
     year = int(info_sep[0].split(".")[0])
     month = int(info_sep[0].split(".")[1])
     day = int(info_sep[0].split(".")[2])
-    teacher_info = str(" ".join(info_sep[2:new_info_starts]))
+    teacher_info = str(" ".join(info_sep[2:4]))
     new_date = date(year, month, day)
     try:
         if "реагенты:" in info_sep:
