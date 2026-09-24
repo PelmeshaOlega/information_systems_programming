@@ -52,6 +52,28 @@ class Materials(EducationalClasses):
         print(str(self.__students_count) + " "+ str(self.__instruments_count) + " " +
               self.__theme + " " + " ".join(self.__materials))
 
+class Factory():
+
+    last_date: date = date(1,1,1)
+    last_teacher = ""
+    last_audience = ""
+
+    def create_lesson(self, info):
+        year = int(info[1].split(".")[0])
+        month = int(info[1].split(".")[1])
+        day = int(info[1].split(".")[2])
+        new_date = date(year, month, day)
+        Factory.last_date = new_date
+        Factory.last_audience = info[2]
+        Factory.last_teacher = str(" ".join(info[3:5]))
+        return Lesson(Factory.last_date, Factory.last_audience, Factory.last_teacher, info[5])
+
+    def create_materials(self, info):
+        theme = str(" ".join(info[2:info.index("материалы:")]))
+        return Materials (Factory.last_date, Factory.last_audience, Factory.last_teacher, int(info[1].strip()),
+               int(info[2].strip()), theme, materials_for_lessons("материалы:", info))
+    pass
+
 def extract_lines(way: str) -> list:
     with open(way, "r", encoding="utf8") as file:
         return file.readlines()
@@ -69,40 +91,38 @@ def materials_for_lessons(start: str, source_info: list) -> list:
     return materials
 
 def parser(information: list) -> list:
+    objects_list = []
+    new_factory = Factory()
+
     for info in information:
         info_sep = info.split()
 
-        try:
-            if "урок:" in info_sep:
-                    year = int(info_sep[1].split(".")[0])
-                    month = int(info_sep[1].split(".")[1])
-                    day = int(info_sep[1].split(".")[2])
-                    new_date = date(year, month, day)
-                    current_date = new_date
-                    current_audience = info_sep[2]
-                    current_teacher = str(" ".join(info_sep[3:5]))
-                    new_class = Lesson(current_date, current_audience, current_teacher, info_sep[5])
-                    objects_list.append(new_class)
-                #поправить, тут Value Error есть.
-            elif "сведения:" in info_sep:
-                    theme = str(" ".join(info_sep[2:info_sep.index("материалы:")]))
-                    new_class = Materials(current_date, current_audience, current_teacher, int(info_sep[1].strip()),
-                                          int(info_sep[2].strip()), theme, materials_for_lessons("материалы:", info_sep))
-                    objects_list.append(new_class)
-            else:
-                    new_class = EducationalClasses(current_date, current_audience, current_teacher)
-                    objects_list.append(new_class)
-        except ValueError:
-            print("ВВЕДИТЕ ДАТУ В НУЖНОМ ФОРМАТЕ")
-            print("Создан стандартный объект, с вашими данными, не учитывающими дату")
-            new_class = EducationalClasses(date(2003, 11, 22), info_sep[1], str(" ".join(info_sep[2:])))
+        if info_sep[0] == "урок:":
+            new_class = new_factory.create_lesson(info_sep)
+            objects_list.append(new_class)
+        elif info_sep[0] == "сведения:":
+            new_class = new_factory.create_materials(info_sep)
+            objects_list.append(new_class)
     return objects_list
 
-objects_list = []
-result:list = parser(extract_lines("text.txt"))
+list_of_all_objects = []
+parsing_objects = []
 
-for obj in objects_list:
-    if isinstance(obj, Lesson):
-        obj.print_type()
-    elif isinstance(obj, Materials):
-        obj.print_info()
+while True:
+    print("1 - добавить в файл\n2 - вывести\n3 - считать с файла\n4 - выход\n")
+    menu_number:int = int(input())
+    print("Выберите одну из комманд:")
+    if menu_number == 1:
+        for obj in parsing_objects:
+            list_of_all_objects.append(obj)
+    elif menu_number == 2:
+        for obj in list_of_all_objects:
+            if isinstance(obj, Lesson):
+                obj.print_type()
+            elif isinstance(obj, Materials):
+                obj.print_info()
+        print("\n")
+    elif menu_number == 3:
+         parsing_objects = parser(extract_lines("text.txt"))
+    elif menu_number == 4:
+        break
